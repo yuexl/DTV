@@ -3,6 +3,7 @@ import { Bookmark } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PLATFORM_LABEL, PLATFORM_TAB_ORDER, type LivePlatform } from "@/api";
 import { cn } from "@/lib/cn";
+import { detectDesktopOS, isWailsRuntime } from "@/lib/window";
 import styles from "./PlatformTabs.module.css";
 
 /** 导航项：四个平台 + "订阅"。"订阅"不是平台，但和平台同级切换。 */
@@ -49,8 +50,16 @@ export function PlatformTabs() {
   const go = (next: TabId) => {
     if (!(next in TAB_PATH)) return;
     const target = TAB_PATH[next];
+    // Linux 桌面端禁用 View Transitions：Wails v3 检测到 NVIDIA 显卡会在
+    // application_linux.go 里自动设置 WEBKIT_DISABLE_DMABUF_RENDERER=1，
+    // 使 WebKitGTK 6.0 的 AcceleratedBackingStore 为空；而 startViewTransition()
+    // 会强制进入加速合成并解引用该空指针，导致 UI 进程 SIGSEGV（addr=0x48）。
+    // 见 https://bugs.webkit.org/show_bug.cgi?id=324730 （2.48/2.50/2.52 系列）。
+    // 等 WebKitGTK 修复后可以去掉这个判断；macOS / Windows 仍保留淡入。
+    const skipViewTransition = isWailsRuntime() && detectDesktopOS() === "linux";
     // M-03：支持的运行时用 View Transitions 做 180ms 淡入；不支持直接切。
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const reduce =
+      skipViewTransition || window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     const start = (
       document as Document & {
         startViewTransition?: (cb: () => void) => unknown;
