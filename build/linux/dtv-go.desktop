@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=dtv-go
+Exec=dtv-go
+Icon=dtv-go
+Categories=Utility;
+Comment=DTV 直播聚合客户端 (Wails/Go 版)
+Terminal=false
+Keywords=wails
+Version=1.0
+StartupNotify=false

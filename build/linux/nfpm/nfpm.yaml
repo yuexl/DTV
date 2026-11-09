@@ -1,0 +1,59 @@
+# nfpm 配置：生成 dtv-go 的 .deb 安装包
+# 打包命令（在仓库根目录执行）：
+#   wails3 task linux:create:deb
+#   或 wails3 tool package -name dtv-go -format deb \
+#        -config ./build/linux/nfpm/nfpm.yaml -out ./bin
+#
+# 为什么叫 dtv-go：系统里已经通过 dpkg 装了旧版 Tauri 的 `dtv`（2.4.5），
+# 它独占 /usr/bin/dtv。包名、二进制、desktop、icon 全部用 dtv-go 前缀，
+# 保证两个版本可以共存、dpkg 不会覆盖旧包的文件。
+#
+# version 与 build/config.yml 的 info.version 保持一致（当前 4.1.0）。
+# contents 里的 src 路径按「执行命令时的 CWD」解析，所以必须在仓库根目录打包。
+#
+# 注意：仓库没有 LICENSE 文件、README 也未声明许可证，因此这里不写 license 字段，
+# 不要凭空给 deb 标注许可证。若要进 Debian 仓库，先补上版权/许可说明。
+
+name: "dtv-go"
+arch: "amd64"
+platform: "linux"
+version: "4.1.0"
+section: "utils"
+priority: "optional"
+maintainer: "DTV <dtv@example.com>"
+vendor: "DTV"
+homepage: "https://github.com/c-zeong/DTV"
+release: "1"
+description: |
+  多平台直播聚合客户端 (DTV)
+  基于 Wails v3 的跨平台直播客户端，支持斗鱼、虎牙、抖音与 bilibili，
+  提供分区浏览、主播收藏、弹幕显示与明暗主题切换。
+  摘要里保留空格分隔，避免 lintian 把整句中文当成一个词而报 description-too-short。
+
+# Wails v3 默认走 GTK4 / WebKitGTK 6.0 栈（二进制动态链接
+# libwebkitgtk-6.0.so.4、libgtk-4.so.1、libsoup-3.0.so.0、
+# libjavascriptcoregtk-6.0.so.1）。libc6 是 ELF 二进制的运行时依赖。
+depends:
+  - libgtk-4-1
+  - libwebkitgtk-6.0-4
+  - libc6
+
+contents:
+  # 真二进制放到 /usr/lib，/usr/bin/dtv-go 是启动包装（见 dtv-go.sh）。
+  # 这样命令行、桌面图标、右键「使用独立显卡启动」都会带上必要环境变量。
+  - src: "./bin/dtv-go"
+    dst: "/usr/lib/dtv-go/dtv-go"
+    file_info:
+      mode: 0755
+  - src: "./build/linux/dtv-go.sh"
+    dst: "/usr/bin/dtv-go"
+    file_info:
+      mode: 0755
+  - src: "./build/appicon.png"
+    dst: "/usr/share/icons/hicolor/512x512/apps/dtv-go.png"
+    file_info:
+      mode: 0644
+  - src: "./build/linux/dtv-go.desktop"
+    dst: "/usr/share/applications/dtv-go.desktop"
+    file_info:
+      mode: 0644

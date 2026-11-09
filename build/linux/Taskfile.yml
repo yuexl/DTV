@@ -1,0 +1,57 @@
+version: '3'
+
+includes:
+  common: ../Taskfile.yml
+
+vars:
+  # 本机通过 dpkg 装了旧版 Tauri 的 dtv（2.4.5，包名就叫 dtv，独占
+  # /usr/bin/dtv）。Linux 产物统一用 dtv-go 前缀，保证两个版本共存：
+  # dpkg 不会把新包当成旧包的升级版，文件路径也不会互相覆盖。
+  # nfpm.yaml、dtv-go.desktop、图标路径全部按这个名字写死，改名时要一起改。
+  LINUX_NAME: "dtv-go"
+  NFPM_CONFIG: "./build/linux/nfpm/nfpm.yaml"
+
+tasks:
+  build:
+    summary: 构建 Linux 二进制（GTK4 / WebKitGTK 6.0，必须开 CGO）
+    deps:
+      - task: common:go:mod:tidy
+      - task: common:build:frontend
+    env:
+      CGO_ENABLED: "1"
+      GOOS: linux
+      GOARCH: '{{.ARCH | default ARCH}}'
+    cmds:
+      - >-
+        go build -tags production -trimpath -buildvcs=false -ldflags="-w -s"
+        -o {{.BIN_DIR}}/{{.LINUX_NAME}}
+
+  generate:dotdesktop:
+    summary: 生成 .desktop 启动项
+    cmds:
+      - >-
+        wails3 generate .desktop
+        -name "{{.LINUX_NAME}}" -exec "{{.LINUX_NAME}}" -icon "{{.LINUX_NAME}}"
+        -outputfile "build/linux/{{.LINUX_NAME}}.desktop"
+        -categories "Utility;"
+        -comment "DTV 直播聚合客户端 (Wails/Go 版)"
+      - chmod 0644 "build/linux/{{.LINUX_NAME}}.desktop"
+
+  create:deb:
+    summary: 生成 .deb 安装包
+    deps:
+      - build
+      - generate:dotdesktop
+    cmds:
+      - >-
+        wails3 tool package -name "{{.LINUX_NAME}}" -format deb
+        -config {{.NFPM_CONFIG}} -out {{.BIN_DIR}}
+
+  package:
+    summary: 打包（当前只产出 deb，不生成 AppImage / rpm / aur）
+    cmds:
+      - task: create:deb
+
+  run:
+    cmds:
+      - '{{.BIN_DIR}}/{{.LINUX_NAME}}'
