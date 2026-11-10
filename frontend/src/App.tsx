@@ -4,6 +4,7 @@ import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { dismissSplash } from "./lib/splash";
 import { AppRoutes } from "./routes";
 import { BilibiliAuthProvider } from "./state/BilibiliAuthProvider";
+import { BlocklistProvider } from "./state/BlocklistProvider";
 import { DouyuAuthProvider } from "./state/DouyuAuthProvider";
 import { FollowProvider } from "./state/FollowProvider";
 import { PlayerUiProvider } from "./state/PlayerUiProvider";
@@ -45,17 +46,19 @@ export function App() {
       <HashRouter>
         <ThemeProvider>
           <ToastProvider>
-            <FollowProvider>
-              <BilibiliAuthProvider>
-                <DouyuAuthProvider>
-                  <PlayerUiProvider>
-                    <SubscriptionProvider>
-                      <RouteBoundary />
-                    </SubscriptionProvider>
-                  </PlayerUiProvider>
-                </DouyuAuthProvider>
-              </BilibiliAuthProvider>
-            </FollowProvider>
+            <BlocklistProvider>
+              <FollowProvider>
+                <BilibiliAuthProvider>
+                  <DouyuAuthProvider>
+                    <PlayerUiProvider>
+                      <SubscriptionProvider>
+                        <RouteBoundary />
+                      </SubscriptionProvider>
+                    </PlayerUiProvider>
+                  </DouyuAuthProvider>
+                </BilibiliAuthProvider>
+              </FollowProvider>
+            </BlocklistProvider>
           </ToastProvider>
         </ThemeProvider>
       </HashRouter>

@@ -1,0 +1,175 @@
+.subtitle {
+  margin: 0 0 12px;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: var(--fill-quaternary);
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex: 0 0 auto;
+  background: var(--fill-tertiary);
+  border: 1px solid var(--border);
+}
+
+.meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  min-width: 0;
+}
+
+.platform {
+  flex: 0 0 auto;
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: var(--weight-semibold);
+}
+
+.roomId {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+
+.unblockBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  background: var(--fill-tertiary);
+  border: 1px solid transparent;
+  transition:
+    color var(--dur-2) var(--ease-out),
+    background-color var(--dur-2) var(--ease-out);
+}
+
+.unblockBtn:hover {
+  color: var(--text-primary);
+  background: var(--accent-soft);
+}
+
+/* ------------------------------------------------------------------ 空态 */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 34px 14px;
+  text-align: center;
+}
+
+.emptyIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  color: var(--text-tertiary);
+  background: var(--fill-quaternary);
+}
+
+.emptyTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+}
+
+.emptyHint {
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+  color: var(--text-tertiary);
+}
+
+/* --------------------------------------------------------------- 底部按钮 */
+
+/* margin-right:auto 把「清空全部」推到左侧，和右侧「完成」分开 */
+.clearBtn {
+  margin-right: auto;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--danger);
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+.clearBtn:hover {
+  background: var(--fill-quaternary);
+}
+
+.clearBtnArmed,
+.clearBtnArmed:hover {
+  color: #fff;
+  background: var(--danger);
+  border-color: transparent;
+}
+
+.doneBtn {
+  height: 34px;
+  padding: 0 20px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--accent-text);
+  background: var(--accent);
+}
+
+.doneBtn:hover {
+  background: var(--accent-hover);
+}

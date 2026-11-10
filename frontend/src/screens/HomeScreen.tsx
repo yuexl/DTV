@@ -1,13 +1,21 @@
 import { RotateCw } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { api, PLATFORM_LABEL, type Category, type CategoryGroup, type LivePlatform } from "@/api";
+import {
+  api,
+  PLATFORM_LABEL,
+  type Category,
+  type CategoryGroup,
+  type LivePlatform,
+  type Streamer,
+} from "@/api";
 import { CategoryBar } from "@/components/categories/CategoryBar";
 import { StreamerGrid } from "@/components/streamers/StreamerGrid";
 import { Spinner } from "@/components/ui/Spinner";
 import { useStreamerFeed } from "@/hooks/useStreamerFeed";
 import { useToast } from "@/state/ToastProvider";
 import { useFollow } from "@/state/FollowProvider";
+import { useBlocklist } from "@/state/BlocklistProvider";
 import { useSubscriptions } from "@/state/SubscriptionProvider";
 import { loadSessionNumber, saveSessionNumber, STORAGE_KEYS } from "@/lib/storage";
 import styles from "./HomeScreen.module.css";
@@ -27,6 +35,7 @@ interface HomeScreenProps {
  */
 export function HomeScreen({ platform }: HomeScreenProps) {
   const { isFollowing, toggleFollow } = useFollow();
+  const { isBlocked, toggleBlock } = useBlocklist();
   const { isSubscribed, toggle: toggleSubscription } = useSubscriptions();
   const { toast } = useToast();
 
@@ -251,6 +260,19 @@ export function HomeScreen({ platform }: HomeScreenProps) {
     toast(wasSubscribed ? "已取消订阅该分区" : "已订阅该分区", "success");
   }, [activeCategory, activeGroup, isSubscribed, platform, toast, toggleSubscription]);
 
+  const handleToggleBlock = useCallback(
+    (streamer: Streamer) => {
+      const nowBlocked = toggleBlock(streamer);
+      toast(
+        nowBlocked
+          ? `已屏蔽「${streamer.nickname}」，可在左侧「屏蔽名单」恢复`
+          : `已取消屏蔽「${streamer.nickname}」`,
+        nowBlocked ? "info" : "success",
+      );
+    },
+    [toggleBlock, toast],
+  );
+
   const handleRetry = useCallback(() => {
     setReloadKey((k) => k + 1);
     feed.reload();
@@ -310,6 +332,8 @@ export function HomeScreen({ platform }: HomeScreenProps) {
           hasMore={feed.hasMore}
           isFollowed={isFollowing}
           onToggleFollow={toggleFollow}
+          isBlocked={isBlocked}
+          onToggleBlock={handleToggleBlock}
           onRetry={handleRetry}
           onClearFilter={
             activeSubCategoryId

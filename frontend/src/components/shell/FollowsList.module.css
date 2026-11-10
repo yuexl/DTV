@@ -1251,3 +1251,94 @@
 .btnDanger:hover {
   background: color-mix(in srgb, var(--danger) 86%, #000);
 }
+
+/* ------------------------------------------------- 底部：屏蔽名单入口 */
+
+.footer {
+  flex: 0 0 auto;
+  padding: 8px 10px 10px;
+  border-top: 1px solid var(--separator);
+}
+
+.footerCollapsed {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 10px;
+}
+
+.blocklistBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  transition:
+    background-color var(--dur-2) var(--ease-out),
+    color var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out);
+}
+
+.blocklistBtn:hover {
+  color: var(--text-primary);
+  background: var(--fill-quaternary);
+}
+
+/* 折叠态：收成一个居中图标按钮，数量用小角标 */
+.footerCollapsed .blocklistBtn {
+  width: 46px;
+  height: 42px;
+  justify-content: center;
+  padding: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+}
+
+.footerCollapsed .blocklistBtn:hover {
+  color: var(--accent-ink);
+  border-color: var(--accent-ink);
+  background: var(--accent-softer);
+}
+
+.blocklistLabel {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.blocklistCount {
+  flex: 0 0 auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  background: var(--fill-tertiary);
+  color: var(--text-tertiary);
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.blocklistBadge {
+  position: absolute;
+  right: 2px;
+  bottom: 1px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: var(--radius-full);
+  background: var(--fill-tertiary);
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: var(--weight-semibold);
+  line-height: 14px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

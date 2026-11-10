@@ -1,4 +1,5 @@
 import {
+  Ban,
   Check,
   ChevronRight,
   Folder,
@@ -21,8 +22,10 @@ import { Modal } from "@/components/ui/Modal";
 import { cn } from "@/lib/cn";
 import { useOpenPlayer } from "@/lib/navigation";
 import { PLATFORM_LABEL, type LivePlatform } from "@/api";
+import { useBlocklist } from "@/state/BlocklistProvider";
 import { followKey, useFollow, type FollowRecord } from "@/state/FollowProvider";
 import { useToast } from "@/state/ToastProvider";
+import { BlocklistModal } from "./BlocklistModal";
 import styles from "./FollowsList.module.css";
 
 type StreamerMenuTarget = {
@@ -66,6 +69,7 @@ export function FollowsList({
 }) {
   const openRoom = useOpenPlayer();
   const { toast } = useToast();
+  const { blocks } = useBlocklist();
   const {
     follows,
     topLevel,
@@ -93,6 +97,7 @@ export function FollowsList({
   const [dragFolderId, setDragFolderId] = useState<string | null>(null);
   const [dragOverKey, setDragOverKey] = useState<string | null>(null);
   const [overlayOpen, setOverlayOpen] = useState(false);
+  const [blocklistOpen, setBlocklistOpen] = useState(false);
   const [overlayFilter, setOverlayFilter] = useState<"ALL" | LivePlatform>("ALL");
   const [collapsedFolder, setCollapsedFolder] = useState<{
     folderId: string;
@@ -791,6 +796,29 @@ export function FollowsList({
         )}
       </div>
 
+      {/* ------------------------------------------------ 底部：屏蔽名单入口
+          flex:0 0 auto，固定在滚动列表下方，折叠态也能点开（关注为空时同样可达） */}
+      <div className={cn(styles.footer, collapsed && styles.footerCollapsed)}>
+        <button
+          type="button"
+          className={styles.blocklistBtn}
+          onClick={() => setBlocklistOpen(true)}
+          aria-label={`屏蔽名单（${blocks.length}）`}
+          title={`屏蔽名单 · ${blocks.length} 位`}
+        >
+          <Ban size={16} strokeWidth={2.1} />
+          {!collapsed && (
+            <>
+              <span className={styles.blocklistLabel}>屏蔽名单</span>
+              <span className={styles.blocklistCount}>{blocks.length}</span>
+            </>
+          )}
+          {collapsed && blocks.length > 0 && (
+            <span className={styles.blocklistBadge}>{blocks.length}</span>
+          )}
+        </button>
+      </div>
+
       {/* ------------------------------------------------ 折叠态文件夹悬浮弹窗 */}
       {collapsed &&
         collapsedFolder &&
@@ -1104,6 +1132,8 @@ export function FollowsList({
           )}
         </Modal>
       )}
+
+      {blocklistOpen && <BlocklistModal onClose={() => setBlocklistOpen(false)} />}
     </div>
   );
 }

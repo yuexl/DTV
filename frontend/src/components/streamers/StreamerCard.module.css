@@ -92,11 +92,19 @@
   margin-left: 2px;
 }
 
-/* 关注按钮：默认隐形，hover 媒体区时淡入；只做 opacity */
-.followBtn {
+/* 关注 / 屏蔽按钮：并排浮在封面左上角，hover 媒体区时一起淡入 */
+.mediaActions {
   position: absolute;
   top: 8px;
   left: 8px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.followBtn,
+.blockBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -114,11 +122,14 @@
 }
 
 .media:hover .followBtn,
-.followBtn:focus-visible {
+.media:hover .blockBtn,
+.followBtn:focus-visible,
+.blockBtn:focus-visible {
   opacity: 1;
 }
 
-.followBtn:hover {
+.followBtn:hover,
+.blockBtn:hover {
   background: rgba(8, 9, 11, 0.9);
 }
 

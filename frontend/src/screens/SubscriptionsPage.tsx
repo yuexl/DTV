@@ -1,11 +1,13 @@
 import { Bookmark, Plus, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { PLATFORM_LABEL, type LivePlatform } from "@/api";
+import { PLATFORM_LABEL, type LivePlatform, type Streamer } from "@/api";
 import { StreamerGrid } from "@/components/streamers/StreamerGrid";
 import { useStreamerFeed } from "@/hooks/useStreamerFeed";
 import { cn } from "@/lib/cn";
+import { useBlocklist } from "@/state/BlocklistProvider";
 import { useFollow } from "@/state/FollowProvider";
 import { useSubscriptions } from "@/state/SubscriptionProvider";
+import { useToast } from "@/state/ToastProvider";
 import styles from "./SubscriptionsPage.module.css";
 
 /**
@@ -17,6 +19,8 @@ import styles from "./SubscriptionsPage.module.css";
 export function SubscriptionsPage() {
   const { subscriptions, unsubscribe } = useSubscriptions();
   const { isFollowing, toggleFollow } = useFollow();
+  const { isBlocked, toggleBlock } = useBlocklist();
+  const { toast } = useToast();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const lastScrolledKeyRef = useRef<string | null | undefined>(undefined);
@@ -54,6 +58,19 @@ export function SubscriptionsPage() {
       unsubscribe(platform, cate2Id);
     },
     [unsubscribe],
+  );
+
+  const handleToggleBlock = useCallback(
+    (streamer: Streamer) => {
+      const nowBlocked = toggleBlock(streamer);
+      toast(
+        nowBlocked
+          ? `已屏蔽「${streamer.nickname}」，可在左侧「屏蔽名单」恢复`
+          : `已取消屏蔽「${streamer.nickname}」`,
+        nowBlocked ? "info" : "success",
+      );
+    },
+    [toggleBlock, toast],
   );
 
   return (
@@ -117,6 +134,8 @@ export function SubscriptionsPage() {
               hasMore={feed.hasMore}
               isFollowed={isFollowing}
               onToggleFollow={toggleFollow}
+              isBlocked={isBlocked}
+              onToggleBlock={handleToggleBlock}
             />
           </div>
         </>

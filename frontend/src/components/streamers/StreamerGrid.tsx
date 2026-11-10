@@ -16,6 +16,8 @@ interface StreamerGridProps {
   hasMore?: boolean;
   isFollowed: (platform: LivePlatform, id: string) => boolean;
   onToggleFollow: (streamer: Streamer) => void;
+  isBlocked: (platform: LivePlatform, id: string) => boolean;
+  onToggleBlock: (streamer: Streamer) => void;
   /** 空态里的"刷新"动作 */
   onRetry?: () => void;
   /** 因三级分区过滤过窄导致空列表时，提供"清除筛选" */
@@ -34,6 +36,8 @@ export function StreamerGrid({
   hasMore = false,
   isFollowed,
   onToggleFollow,
+  isBlocked,
+  onToggleBlock,
   onRetry,
   onClearFilter,
   categoryFilterName,
@@ -57,38 +61,54 @@ export function StreamerGrid({
     );
   }
 
-  if (streamers.length === 0) {
+  // 视图层过滤：被屏蔽的主播仍留在 feed 缓存里，取消屏蔽后无需重新拉流即可恢复。
+  const visible = streamers.filter((s) => !isBlocked(s.platform, s.id));
+  const hiddenCount = streamers.length - visible.length;
+
+  if (visible.length === 0) {
+    const allBlocked = hiddenCount > 0;
     return (
       <div className={styles.empty}>
         <SignalMark size={26} />
-        <p className={styles.emptyTitle}>这个分区暂时没有主播在播</p>
-        <p className={styles.emptyHint}>换一个分区，或稍后再来看看</p>
-        <div className={styles.emptyActions}>
-          {onRetry && (
-            <button type="button" className={styles.emptyPrimary} onClick={onRetry}>
-              <RotateCw size={13} strokeWidth={2.4} />
-              刷新
-            </button>
-          )}
-          {onClearFilter && (
-            <button type="button" className={styles.emptyGhost} onClick={onClearFilter}>
-              清除筛选
-            </button>
-          )}
-        </div>
+        <p className={styles.emptyTitle}>
+          {allBlocked ? "本页主播均已被屏蔽" : "这个分区暂时没有主播在播"}
+        </p>
+        <p className={styles.emptyHint}>
+          {allBlocked
+            ? "可在左侧「屏蔽名单」中取消屏蔽后恢复显示"
+            : "换一个分区，或稍后再来看看"}
+        </p>
+        {!allBlocked && (
+          <div className={styles.emptyActions}>
+            {onRetry && (
+              <button type="button" className={styles.emptyPrimary} onClick={onRetry}>
+                <RotateCw size={13} strokeWidth={2.4} />
+                刷新
+              </button>
+            )}
+            {onClearFilter && (
+              <button type="button" className={styles.emptyGhost} onClick={onClearFilter}>
+                清除筛选
+              </button>
+            )}
+          </div>
+        )}
       </div>
     );
   }
 
+  const hiddenSuffix = hiddenCount > 0 ? ` · 已隐藏 ${hiddenCount} 位` : "";
+
   return (
     <>
       <div className={styles.grid}>
-        {streamers.map((streamer, index) => (
+        {visible.map((streamer, index) => (
           <StreamerCard
             key={`${streamer.platform}-${streamer.id}`}
             streamer={streamer}
             followed={isFollowed(streamer.platform, streamer.id)}
             onToggleFollow={() => onToggleFollow(streamer)}
+            onToggleBlock={() => onToggleBlock(streamer)}
             // P-07：首屏前 4 张图高优先级，其余低优先级
             priority={index < 4}
             hideCategory={
@@ -106,9 +126,11 @@ export function StreamerGrid({
             正在加载更多…
           </span>
         ) : hasMore ? (
-          <span className={styles.footerHint}>继续下滑加载更多</span>
+          <span className={styles.footerHint}>继续下滑加载更多{hiddenSuffix}</span>
         ) : (
-          <span className={styles.footerHint}>已显示最近 {streamers.length} 条</span>
+          <span className={styles.footerHint}>
+            已显示最近 {visible.length} 条{hiddenSuffix}
+          </span>
         )}
       </div>
     </>

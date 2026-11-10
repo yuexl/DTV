@@ -15,6 +15,8 @@ export const STORAGE_KEYS = {
   followFolders: "followFolders",
   /** 顶层关注主播的排序 */
   followOrder: "followListOrder",
+  /** 屏蔽名单（本机保存，不参与配置导出 / LAN 同步） */
+  blocklist: "dtv_blocked_streamers_v1",
   /** 订阅的分区（老版键名，值为兼容后的订阅数组） */
   subscriptions: "dtv_custom_categories_v1",
   playerQuality: (platform: string) => `${platform.toUpperCase()}_preferred_quality`,

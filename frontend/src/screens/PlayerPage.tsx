@@ -1,4 +1,5 @@
 import {
+  Ban,
   MonitorOff,
   RotateCw,
   Star,
@@ -38,6 +39,7 @@ import { loadJSON, loadRaw, saveJSON, saveRaw, STORAGE_KEYS } from "@/lib/storag
 import { prepareStreamRelay, supportsStreamRelay } from "@/lib/streamRelay";
 import { exitWindowFullscreen, isWindowFullscreen, onWindowFullscreenChange } from "@/lib/window";
 import { useFollow } from "@/state/FollowProvider";
+import { useBlocklist } from "@/state/BlocklistProvider";
 import { BILIBILI_AUTH_EVENT } from "@/state/BilibiliAuthProvider";
 import { DOUYU_AUTH_EVENT } from "@/state/DouyuAuthProvider";
 import { usePlayerUi } from "@/state/PlayerUiProvider";
@@ -129,6 +131,7 @@ export function PlayerPage() {
     isFullscreen,
   } = usePlayerUi();
   const { isFollowing, toggleFollow } = useFollow();
+  const { isBlocked, toggleBlock } = useBlocklist();
   const { toast } = useToast();
 
   const [info, setInfo] = useState<StreamInfo | null>(null);
@@ -797,9 +800,24 @@ export function PlayerPage() {
   }, [exitPlayerFullscreen, navigate]);
 
   const followed = info ? isFollowing(info.platform, info.roomId) : false;
+  const blocked = info ? isBlocked(info.platform, info.roomId) : false;
   const colorfulSupported = Boolean(
     info && COLORFUL_DANMU_PLATFORMS.includes(info.platform),
   );
+
+  const handleToggleBlock = useCallback(() => {
+    if (!info) return;
+    const nowBlocked = toggleBlock({
+      platform: info.platform,
+      id: info.roomId,
+      nickname: info.nickname,
+      avatar: info.avatar,
+    });
+    toast(
+      nowBlocked ? "已屏蔽，可在左侧「屏蔽名单」恢复" : "已取消屏蔽",
+      nowBlocked ? "info" : "success",
+    );
+  }, [info, toggleBlock, toast]);
 
   /* ------------------------------------------------------------------ 渲染 */
   if (!roomId) {
@@ -904,6 +922,16 @@ export function PlayerPage() {
                           fill={followed ? "currentColor" : "none"}
                         />
                         {followed ? "已关注" : "关注"}
+                      </button>
+                      <button
+                        type="button"
+                        className={cn(styles.followBtn, blocked && styles.blockBtnOn)}
+                        onClick={handleToggleBlock}
+                        aria-pressed={blocked}
+                        title={blocked ? "取消屏蔽" : "屏蔽（加入屏蔽名单）"}
+                      >
+                        <Ban size={14} strokeWidth={2.4} />
+                        {blocked ? "已屏蔽" : "屏蔽"}
                       </button>
                       {info.platform === "bilibili" && (
                         <BilibiliLoginButton variant="compact" />

@@ -1,5 +1,5 @@
 import { Card } from "@heroui/react";
-import { Play, Star } from "lucide-react";
+import { Ban, Play, Star } from "lucide-react";
 import { useCallback } from "react";
 import type { Streamer } from "@/api";
 import { SmoothImage } from "@/components/common/SmoothImage";
@@ -13,6 +13,8 @@ interface StreamerCardProps {
   streamer: Streamer;
   followed: boolean;
   onToggleFollow: () => void;
+  /** 屏蔽后该卡片会从列表里消失，所以不需要「已屏蔽」态 */
+  onToggleBlock: () => void;
   /** 首屏前几张图提高加载优先级 */
   priority?: boolean;
   /** 与当前筛选分类相同，不再重复展示分类胶囊 */
@@ -36,6 +38,7 @@ export function StreamerCard({
   streamer,
   followed,
   onToggleFollow,
+  onToggleBlock,
   priority = false,
   hideCategory = false,
 }: StreamerCardProps) {
@@ -69,15 +72,26 @@ export function StreamerCard({
           </span>
         </button>
 
-        <button
-          type="button"
-          className={cn(styles.followBtn, followed && styles.followBtnOn)}
-          onClick={onToggleFollow}
-          aria-label={followed ? "取消关注" : "关注"}
-          aria-pressed={followed}
-        >
-          <Star size={15} strokeWidth={2.4} fill={followed ? "currentColor" : "none"} />
-        </button>
+        <div className={styles.mediaActions}>
+          <button
+            type="button"
+            className={cn(styles.followBtn, followed && styles.followBtnOn)}
+            onClick={onToggleFollow}
+            aria-label={followed ? "取消关注" : "关注"}
+            aria-pressed={followed}
+          >
+            <Star size={15} strokeWidth={2.4} fill={followed ? "currentColor" : "none"} />
+          </button>
+          <button
+            type="button"
+            className={styles.blockBtn}
+            onClick={onToggleBlock}
+            aria-label="屏蔽"
+            title="屏蔽（加入屏蔽名单）"
+          >
+            <Ban size={15} strokeWidth={2.4} />
+          </button>
+        </div>
       </div>
 
       <button type="button" className={styles.meta} onClick={open}>

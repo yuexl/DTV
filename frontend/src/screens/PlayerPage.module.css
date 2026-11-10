@@ -320,6 +320,18 @@
   transform: none;
 }
 
+/* 屏蔽态：与「已关注」的绿色区分开，用 danger 色调 */
+.blockBtnOn {
+  color: #fff;
+  background: rgba(220, 38, 38, 0.32);
+  border-color: rgba(248, 113, 113, 0.5);
+}
+
+.blockBtnOn:hover {
+  background: rgba(220, 38, 38, 0.42);
+  transform: none;
+}
+
 /* 播放器顶栏：开关右侧弹幕列表 */
 .danmuToggle {
   display: inline-flex;
